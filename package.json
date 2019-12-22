@@ -9,7 +9,7 @@
     "preview": true,
     "repository": {
         "type": "git",
-        "url": "https://github.com/hbenl/vscode-example-test-adapter.git"
+        "url": "https://github.com/Bochlin/vunit-test-explorer"
     },
     "categories": [
         "Other"
