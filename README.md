@@ -1,2 +1,4 @@
-# vunit-test-explorer
-VUnit test explorer for VSCode
+# VUnit Test Explorer (preview)
+Run your VUnit tests in the Sidebar of Visual Studio Code.
+
+![](/img/screenshot.png?raw=true)

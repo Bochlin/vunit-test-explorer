@@ -1,0 +1,4 @@
+{
+    "vunit.runpy": "run.py",
+    "vunit.flattenSingleLibrary": false
+}

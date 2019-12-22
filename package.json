@@ -1,0 +1,79 @@
+{
+    "name": "vunit-test-explorer",
+    "displayName": "VUnit Test Explorer",
+    "description": "Run your VUnit tests in the Sidebar of Visual Studio Code",
+    "author": "Henrik Bohlin",
+    "publisher": "hbohlin",
+    "license": "SEE LICENSE IN LICENSE",
+    "version": "0.0.1",
+    "preview": true,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/hbenl/vscode-example-test-adapter.git"
+    },
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "VUnit",
+        "test",
+        "testing",
+        "VHDL",
+        "vhdl",
+        "verilog",
+        "system verilog",
+        "test adapter",
+        "test explorer"
+    ],
+    "main": "out/main.js",
+    "scripts": {
+        "clean": "rimraf out *.vsix",
+        "build": "tsc",
+        "watch": "tsc -w",
+        "rebuild": "npm run clean && npm run build",
+        "package": "vsce package",
+        "publish": "vsce publish"
+    },
+    "dependencies": {
+        "tslib": "^1.9.3",
+        "vscode-test-adapter-api": "^1.7.0",
+        "vscode-test-adapter-util": "^0.7.0",
+        "tree-kill": "1.2.2"
+    },
+    "devDependencies": {
+        "typescript": "^3.5.3",
+        "vsce": "^1.65.0",
+        "@types/vscode": "^1.32.0"
+    },
+    "engines": {
+        "vscode": "^1.32.0"
+    },
+    "extensionDependencies": [
+        "hbenl.vscode-test-explorer"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "VUnit Test Explorer",
+            "properties": {
+                "vunit.runpy": {
+                    "description": "Path to VUnit python script (run.py) relative to workspaceFolder",
+                    "type": "string"
+                },
+                "vunit.python": {
+                    "description": "Path to python executable",
+                    "type": "string",
+                    "default": "python"
+                },
+                "vunit.flattenSingleLibrary": {
+                    "description": "Flatten library hierarchy in explorer when all tests are contained within a single library.",
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        }
+    }
+}
