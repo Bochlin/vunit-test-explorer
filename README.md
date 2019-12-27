@@ -26,3 +26,21 @@ Property                              | Description
 `testExplorer.addToEditorContextMenu` | Add menu items for running and debugging the tests in the current file to the editor context menu
 `testExplorer.mergeSuites`            | Merge suites with the same label and parent
 `testExplorer.hideEmptyLog`           | Hide the output channel used to show a test's log when the user clicks on a test whose log is empty
+
+# Commands
+
+The following commands are available in VS Code's command palette, use the ID to add them to your keyboard shortcuts:
+
+ID                                   | Command
+-------------------------------------|--------------------------------------------
+`test-explorer.reload`               | Reload tests
+`test-explorer.run-all`              | Run all tests
+`test-explorer.run-file`             | Run tests in current file
+`test-explorer.run-test-at-cursor`   | Run the test at the current cursor position
+`test-explorer.rerun`                | Repeat the last test run
+`test-explorer.debug-test-at-cursor` | Debug the test at the current cursor position
+`test-explorer.redebug`              | Repeat the last test run in the debugger
+`test-explorer.cancel`               | Cancel running tests
+
+# Dependencies
+This extension uses the [Test Explorer for Visual Studio Code](https://github.com/hbenl/vscode-test-explorer) extension published under the MIT license.
