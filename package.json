@@ -1,7 +1,7 @@
 {
     "name": "vunit-test-explorer",
     "displayName": "VUnit Test Explorer",
-    "description": "Run your VUnit tests in the Sidebar of Visual Studio Code",
+    "description": "Run your VUnit tests from the Sidebar of Visual Studio Code",
     "author": "Henrik Bohlin",
     "publisher": "hbohlin",
     "license": "SEE LICENSE IN LICENSE",
@@ -61,7 +61,8 @@
             "properties": {
                 "vunit.runpy": {
                     "description": "Path to VUnit python script (run.py) relative to workspaceFolder",
-                    "type": "string"
+                    "type": "string",
+                    "scope": "window"
                 },
                 "vunit.python": {
                     "description": "Path to python executable",
@@ -72,6 +73,16 @@
                     "description": "Flatten library hierarchy in explorer when all tests are contained within a single library.",
                     "type": "boolean",
                     "default": false
+                },
+                "vunit.options": {
+                    "description": "VUnit command line options.",
+                    "type": "string",
+                    "default": ""
+                },
+                "vunit.guiOptions": {
+                    "description": "VUnit command line options when running GUI, -g should not be added here.",
+                    "type": "string",
+                    "default": ""
                 }
             }
         }

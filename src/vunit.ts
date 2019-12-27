@@ -105,7 +105,7 @@ export async function runVunitTests(
         vscode.window.showErrorMessage(msg);
         throw new Error(msg);
     }
-    let wsRoot = workspaceRoot();
+    let wsRoot = getWorkspaceRoot();
     if (!wsRoot) {
         const msg = 'Unable to start test run, no workspace folder open';
         vscode.window.showErrorMessage(msg);
@@ -150,7 +150,15 @@ export async function runVunitTests(
                 }
             });
     }
-    await runVunit(['--exit-0'].concat(testNames), checkTestResults)
+    let options = ['--exit-0'];
+    const vunitOptions = vscode.workspace
+        .getConfiguration()
+        .get('vunit.options');
+    if (vunitOptions) {
+        options.concat(vunitOptions as string);
+    }
+    options.concat(testNames);
+    await runVunit(options, checkTestResults)
         .catch(err => {
             output.appendLine(err.toString());
         })
@@ -189,7 +197,15 @@ export async function runVunitTestsInGui(
     let msg = `Starting ${testCaseId} in GUI`;
     vscode.window.showInformationMessage(msg);
     output.appendLine(msg);
-    runVunit(['--exit-0', '-g', testCaseId]);
+    let options = ['--exit-0', '-g'];
+    const vunitOptions = vscode.workspace
+        .getConfiguration()
+        .get('vunit.guiOptions');
+    if (vunitOptions) {
+        options.concat(vunitOptions as string);
+    }
+    options.concat(testCaseId);
+    runVunit(options);
 }
 
 function findNode(
@@ -207,7 +223,7 @@ function findNode(
     return undefined;
 }
 
-function workspaceRoot(): string | undefined {
+function getWorkspaceRoot(): string | undefined {
     const workspaceFolder = (vscode.workspace.workspaceFolders || [])[0];
     let wsRoot: string | undefined = undefined;
     if (workspaceFolder) {
@@ -239,7 +255,9 @@ async function runVunit(
 ): Promise<string> {
     return new Promise((resolve, reject) => {
         const runPy = getRunPy();
-        if (!runPy) {
+        if (!getWorkspaceRoot()) {
+            throw new Error('Workspace root not defined.');
+        } else if (!runPy) {
             throw new Error('Unable to determine path of VUnit run script.');
         } else if (!fs.existsSync(runPy)) {
             throw new Error(`VUnit run script ${runPy} does not exist.`);
@@ -249,7 +267,7 @@ async function runVunit(
             .get('vunit.python') as string;
         const args = [runPy].concat(vunitArgs);
         output.appendLine(python + ' ' + args.join(' '));
-        let vunit = spawn(python, args, { cwd: workspaceRoot() });
+        let vunit = spawn(python, args, { cwd: getWorkspaceRoot() });
         vunit.on('close', (code: string) => {
             output.appendLine(`VUnit exited with code ${code}`);
             if (code == '0') {
@@ -269,7 +287,7 @@ async function runVunit(
 }
 
 function getRunPy(): string | undefined {
-    const wsRoot = workspaceRoot();
+    const wsRoot = getWorkspaceRoot();
     const runPyConf = vscode.workspace.getConfiguration().get('vunit.runpy');
     if (wsRoot && runPyConf) {
         return path.join(wsRoot, runPyConf as string);

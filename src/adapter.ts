@@ -86,13 +86,11 @@ export class VUnitAdapter implements TestAdapter {
             tests,
         });
 
-        // in a "real" TestAdapter this would start a test run in a child process
         await runVunitTests(tests, this.testStatesEmitter, this.loadedTests);
 
         this.testStatesEmitter.fire(<TestRunFinishedEvent>{ type: 'finished' });
     }
 
-    // Run test in GUI
     async debug(tests: string[]): Promise<void> {
         runVunitTestsInGui(tests, this.loadedTests);
     }
