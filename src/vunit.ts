@@ -25,10 +25,10 @@ export async function getVunitVersion(): Promise<string> {
     return new Promise((resolve, reject) => {
         let version: string | undefined;
         runVunit(['--version'], (vunit: ChildProcess): void => {
-            vunitProcess = vunit;
+            let proc: any = vunit;
             readline
                 .createInterface({
-                    input: vunitProcess.stdout,
+                    input: proc.stdout,
                     terminal: false,
                 })
                 .on('line', (line: string) => {
