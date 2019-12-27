@@ -21,6 +21,30 @@ import readline = require('readline');
 
 const output = vscode.window.createOutputChannel('VUnit');
 
+export async function getVunitVersion(): Promise<string> {
+    return new Promise((resolve, reject) => {
+        let version: string | undefined;
+        runVunit(['--version'], (vunit: ChildProcess): void => {
+            vunitProcess = vunit;
+            readline
+                .createInterface({
+                    input: vunitProcess.stdout,
+                    terminal: false,
+                })
+                .on('line', (line: string) => {
+                    version = line.trim();
+                    output.appendLine(`Found VUnit version ${version}`);
+                });
+        })
+            .then(() => {
+                resolve(version);
+            })
+            .catch(err => {
+                reject(new Error(err));
+            });
+    });
+}
+
 export async function loadVunitTests(workDir: string): Promise<TestSuiteInfo> {
     const vunit: VunitData = await getVunitData(workDir);
     const testSuite: TestSuiteInfo = {
@@ -236,7 +260,7 @@ async function getVunitData(workDir: string): Promise<VunitData> {
     let vunitData: VunitData = emptyVunitData;
     const vunitJson = path.join(workDir, 'vunit.json');
     output.appendLine('Exporting json data from VUnit...');
-    await runVunit([`--export-json ${vunitJson}`])
+    await runVunit(['--list', `--export-json ${vunitJson}`])
         .then(() => {
             vunitData = JSON.parse(fs.readFileSync(vunitJson, 'utf-8'));
         })
@@ -330,4 +354,5 @@ interface VunitTest {
 interface VunitFile {
     file_name: string;
     library_name: string;
+    [propName: string]: any;
 }

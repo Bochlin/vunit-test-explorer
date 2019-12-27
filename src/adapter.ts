@@ -7,19 +7,20 @@
 import * as vscode from 'vscode';
 import {
     TestAdapter,
+    TestEvent,
     TestLoadStartedEvent,
     TestLoadFinishedEvent,
     TestRunStartedEvent,
     TestRunFinishedEvent,
     TestSuiteInfo,
     TestSuiteEvent,
-    TestEvent,
 } from 'vscode-test-adapter-api';
 import { Log } from 'vscode-test-adapter-util';
 import {
+    cancelRunVunitTests,
+    getVunitVersion,
     loadVunitTests,
     runVunitTests,
-    cancelRunVunitTests,
     runVunitTestsInGui,
 } from './vunit';
 
@@ -67,7 +68,13 @@ export class VUnitAdapter implements TestAdapter {
 
     async load(): Promise<void> {
         this.log.info('Loading VUnit tests');
-
+        await getVunitVersion()
+            .then(res => {
+                this.log.info(`Found VUnit version ${res}`);
+            })
+            .catch(err => {
+                this.log.error(err);
+            });
         this.testsEmitter.fire(<TestLoadStartedEvent>{ type: 'started' });
 
         this.loadedTests = await loadVunitTests(this.workDir);

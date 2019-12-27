@@ -14,6 +14,7 @@ Property                              | Description
 `vunit.flattenSingleLibrary`          | Flatten library hierarchy in explorer when all tests are contained within a single library.
 `vunit.options`                       | VUnit command line options.
 `vunit.guiOptions`                    | VUnit command line options when running GUI (-g should not be added here).
+`testExplorer.onStart`                | Retire or reset all test states whenever a test run is started
 `testExplorer.onReload`               | Retire or reset all test states whenever the test tree is reloaded
 `testExplorer.codeLens`               | Show a CodeLens above each test or suite for running or debugging the tests
 `testExplorer.gutterDecoration`       | Show the state of each test in the editor using Gutter Decorations
