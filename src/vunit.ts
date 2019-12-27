@@ -242,7 +242,6 @@ async function getVunitData(workDir: string): Promise<VunitData> {
         })
         .catch(err => {
             output.appendLine(err);
-            vscode.window.showErrorMessage(err.toString());
             vunitData = emptyVunitData;
         });
     output.appendLine('Finished exporting json data from VUnit');

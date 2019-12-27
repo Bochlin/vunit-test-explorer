@@ -4,3 +4,4 @@ package-lock.json
 tsconfig.json
 .vscode/**
 .gitignore
+*.vsix
