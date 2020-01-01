@@ -42,6 +42,8 @@ export class VUnitAdapter implements TestAdapter {
         children: [],
     };
 
+    private watchedFiles: string[] = [];
+
     get tests(): vscode.Event<TestLoadStartedEvent | TestLoadFinishedEvent> {
         return this.testsEmitter.event;
     }
@@ -77,7 +79,26 @@ export class VUnitAdapter implements TestAdapter {
             });
         this.testsEmitter.fire(<TestLoadStartedEvent>{ type: 'started' });
 
-        this.loadedTests = await loadVunitTests(this.workDir);
+        let vunitData = await loadVunitTests(this.workDir);
+
+        for (let file of vunitData.testFiles.concat(vunitData.runPy)) {
+            if (!this.watchedFiles.includes(file)) {
+                let fileWatcher = vscode.workspace.createFileSystemWatcher(
+                    file
+                );
+                this.watchedFiles.push(file);
+                fileWatcher.onDidChange(() => this.load());
+                fileWatcher.onDidDelete(() => {
+                    this.watchedFiles.splice(
+                        this.watchedFiles.indexOf(file),
+                        1
+                    );
+                    this.load();
+                });
+            }
+        }
+
+        this.loadedTests = vunitData.testSuiteInfo;
 
         this.testsEmitter.fire(<TestLoadFinishedEvent>{
             type: 'finished',

@@ -45,8 +45,14 @@ export async function getVunitVersion(): Promise<string> {
     });
 }
 
-export async function loadVunitTests(workDir: string): Promise<TestSuiteInfo> {
-    const vunit: VunitData = await getVunitData(workDir);
+export async function loadVunitTests(workDir: string): Promise<VunitData> {
+    const runPy = getRunPy();
+    if (!runPy) {
+        return Promise.reject(
+            new Error('Cannot load VUnit tests, no run.py found.')
+        );
+    }
+    const vunit: VunitExportData = await getVunitData(workDir);
     const testSuite: TestSuiteInfo = {
         type: 'suite',
         id: 'root',
@@ -112,7 +118,15 @@ export async function loadVunitTests(workDir: string): Promise<TestSuiteInfo> {
             testBench.label = library.label + '.' + testBench.label;
         }
     }
-    return Promise.resolve<TestSuiteInfo>(testSuite);
+    let vunitData: VunitData = {
+        runPy: runPy,
+        testSuiteInfo: testSuite,
+        testFiles: vunit.files.map((file): string => {
+            return file.file_name;
+        }),
+    };
+
+    return Promise.resolve<VunitData>(vunitData);
 }
 
 let vunitProcess: any;
@@ -146,6 +160,7 @@ export async function runVunitTests(
             }
         }
     }
+
     function checkTestResults(vunit: ChildProcess): void {
         vunitProcess = vunit;
         const testStart = /Starting (.*)/;
@@ -179,9 +194,10 @@ export async function runVunitTests(
         .getConfiguration()
         .get('vunit.options');
     if (vunitOptions) {
-        options.concat(vunitOptions as string);
+        options.push(vunitOptions as string);
     }
-    options.concat(testNames);
+    options = options.concat(testNames);
+    output.appendLine(options.join(' '));
     await runVunit(options, checkTestResults)
         .catch(err => {
             output.appendLine(err.toString());
@@ -226,9 +242,9 @@ export async function runVunitTestsInGui(
         .getConfiguration()
         .get('vunit.guiOptions');
     if (vunitOptions) {
-        options.concat(vunitOptions as string);
+        options.push(vunitOptions as string);
     }
-    options.concat(testCaseId);
+    options.push(testCaseId);
     runVunit(options);
 }
 
@@ -256,9 +272,10 @@ function getWorkspaceRoot(): string | undefined {
     return wsRoot;
 }
 
-async function getVunitData(workDir: string): Promise<VunitData> {
-    let vunitData: VunitData = emptyVunitData;
+async function getVunitData(workDir: string): Promise<VunitExportData> {
+    let vunitData: VunitExportData = emptyVunitExportData;
     const vunitJson = path.join(workDir, 'vunit.json');
+    fs.mkdirSync(path.dirname(vunitJson), { recursive: true });
     output.appendLine('Exporting json data from VUnit...');
     await runVunit(['--list', `--export-json ${vunitJson}`])
         .then(() => {
@@ -266,7 +283,7 @@ async function getVunitData(workDir: string): Promise<VunitData> {
         })
         .catch(err => {
             output.appendLine(err);
-            vunitData = emptyVunitData;
+            vunitData = emptyVunitExportData;
         });
     output.appendLine('Finished exporting json data from VUnit');
     return vunitData;
@@ -290,7 +307,10 @@ async function runVunit(
             .get('vunit.python') as string;
         const args = [runPy].concat(vunitArgs);
         output.appendLine(python + ' ' + args.join(' '));
-        let vunit = spawn(python, args, { cwd: getWorkspaceRoot() });
+        let vunit = spawn(python, args, {
+            cwd: getWorkspaceRoot(),
+            shell: true,
+        });
         vunit.on('close', (code: string) => {
             output.appendLine(`VUnit exited with code ${code}`);
             if (code == '0') {
@@ -319,7 +339,13 @@ function getRunPy(): string | undefined {
     }
 }
 
-interface VunitData {
+export interface VunitData {
+    runPy: string;
+    testSuiteInfo: TestSuiteInfo;
+    testFiles: string[];
+}
+
+interface VunitExportData {
     export_format_version: {
         major: number;
         minor: number;
@@ -330,7 +356,7 @@ interface VunitData {
     [propName: string]: any;
 }
 
-const emptyVunitData: VunitData = {
+const emptyVunitExportData: VunitExportData = {
     export_format_version: {
         major: 1,
         minor: 0,

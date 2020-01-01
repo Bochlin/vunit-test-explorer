@@ -16,9 +16,9 @@ begin
         test_runner_setup(runner, runner_cfg);
         if run("test1") then
             check(true);
-
-            
         elsif run("test2") then
+            check(true);
+        elsif run("test3") then
             check(true);
         end if;
         test_runner_cleanup(runner);
