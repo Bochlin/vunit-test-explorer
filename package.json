@@ -83,6 +83,17 @@
                     "description": "VUnit command line options when running GUI, -g should not be added here.",
                     "type": "string",
                     "default": ""
+                },
+                "vunit.logpanel": {
+                    "description": "write diagnotic logs to an output panel",
+                    "type": "boolean",
+                    "scope": "resource",
+                    "default": true
+                },
+                "vunit.logfile": {
+                    "description": "write diagnostic logs to the given file",
+                    "type": "string",
+                    "scope": "resource"
                 }
             }
         }

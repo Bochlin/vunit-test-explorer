@@ -23,6 +23,7 @@ import {
     runVunitTests,
     runVunitTestsInGui,
 } from './vunit';
+import { performance } from 'perf_hooks';
 
 export class VUnitAdapter implements TestAdapter {
     private disposables: { dispose(): void }[] = [];
@@ -69,17 +70,24 @@ export class VUnitAdapter implements TestAdapter {
     }
 
     async load(): Promise<void> {
-        this.log.info('Loading VUnit tests');
         await getVunitVersion()
             .then(res => {
                 this.log.info(`Found VUnit version ${res}`);
             })
             .catch(err => {
                 this.log.error(err);
+                throw new Error('VUnit not found');
             });
+        this.log.info('Loading VUnit tests...');
         this.testsEmitter.fire(<TestLoadStartedEvent>{ type: 'started' });
-
+        let loadStart = performance.now();
         let vunitData = await loadVunitTests(this.workDir);
+        let loadTime = performance.now() - loadStart;
+        this.log.info(
+            `Loading of tests finished after ${(loadTime / 1000).toFixed(
+                3
+            )} seconds.`
+        );
 
         for (let file of vunitData.testFiles.concat(vunitData.runPy)) {
             if (!this.watchedFiles.includes(file)) {

@@ -15,7 +15,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const workspaceFolder = (vscode.workspace.workspaceFolders || [])[0];
     const workDir = path.join(context.globalStoragePath, 'workdir');
     fs.mkdirSync(workDir, { recursive: true });
-    const log = new Log('vunitExplorer', workspaceFolder, 'VUnit Explorer Log');
+    const log = new Log('vunit', workspaceFolder, 'VUnit Explorer Log');
     context.subscriptions.push(log);
 
     // get the Test Explorer extension
