@@ -318,7 +318,7 @@ export async function findRunPy(
 ): Promise<string[]> {
     let results = await vscode.workspace.findFiles(
         new vscode.RelativePattern(workspaceFolder, '**/run.py'),
-        '**/vunit/{vhdl,verilog}'
+        '**/{vunit,examples,tests/acceptance/artificial}/{vhdl,verilog}'
     );
     let runPy: string[] = results.map(file => {
         return file.fsPath;

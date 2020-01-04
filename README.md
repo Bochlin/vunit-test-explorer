@@ -10,6 +10,8 @@ The following configuration properties are available:
 Property                              | Description
 --------------------------------------|---------------------------------------------------------------
 `vunit.runpy`                         | Path to VUnit python script (run.py) relative to workspace folder.
+`vunit.findRunPy`                     | Detect run.py automatically within workspace.
+`vunit.watch`                         | Watch run.py and test bench files for changes and reload tests automatically.
 `vunit.python`                        | Path to python executable.
 `vunit.flattenSingleLibrary`          | Flatten library hierarchy in explorer when all tests are contained within a single library.
 `vunit.options`                       | VUnit command line options.
