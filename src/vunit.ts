@@ -53,6 +53,7 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
         label: 'VUnit',
         children: [],
     };
+    let tbFiles: string[] = [];
 
     for (let test of vunit.tests) {
         let split = test.name.split('.');
@@ -90,6 +91,10 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
             };
             (library as TestSuiteInfo).children.push(testBench);
         }
+        let testBenchFileName = test.location.file_name;
+        if (!tbFiles.includes(testBenchFileName)) {
+            tbFiles.push(testBenchFileName);
+        }
         let testBenchSrc = fs.readFileSync(test.location.file_name, 'utf8');
         let testCase: TestInfo = {
             type: 'test',
@@ -116,9 +121,7 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
     let vunitData: VunitData = {
         runPy: runPy,
         testSuiteInfo: testSuite,
-        testFiles: vunit.files.map((file): string => {
-            return file.file_name;
-        }),
+        testFiles: tbFiles,
     };
 
     return Promise.resolve<VunitData>(vunitData);
@@ -318,7 +321,7 @@ export async function findRunPy(
 ): Promise<string[]> {
     let results = await vscode.workspace.findFiles(
         new vscode.RelativePattern(workspaceFolder, '**/run.py'),
-        '**/{vunit,examples,tests/acceptance/artificial}/{vhdl,verilog}'
+        '**/{vunit,examples,acceptance/artificial}/{vhdl,verilog}'
     );
     let runPy: string[] = results.map(file => {
         return file.fsPath;
