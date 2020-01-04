@@ -21,12 +21,14 @@ import {
     getVunitVersion,
     loadVunitTests,
     runVunitTests,
-    runVunitTestsInGui,
+    runVunitTestInGui,
 } from './vunit';
 import { performance } from 'perf_hooks';
+import * as path from 'path';
 
 export class VUnitAdapter implements TestAdapter {
     private disposables: { dispose(): void }[] = [];
+    private watchedFiles = new Map<string, vscode.FileSystemWatcher>();
 
     private readonly testsEmitter = new vscode.EventEmitter<
         TestLoadStartedEvent | TestLoadFinishedEvent
@@ -42,8 +44,6 @@ export class VUnitAdapter implements TestAdapter {
         label: 'VUnit',
         children: [],
     };
-
-    private watchedFiles: string[] = [];
 
     get tests(): vscode.Event<TestLoadStartedEvent | TestLoadFinishedEvent> {
         return this.testsEmitter.event;
@@ -62,56 +62,91 @@ export class VUnitAdapter implements TestAdapter {
         private readonly workDir: string,
         private readonly log: Log
     ) {
-        this.log.info('Initializing VUnit adapter');
-
         this.disposables.push(this.testsEmitter);
         this.disposables.push(this.testStatesEmitter);
         this.disposables.push(this.autorunEmitter);
     }
 
     async load(): Promise<void> {
-        await getVunitVersion()
+        this.log.info('Loading VUnit tests...');
+        let loadStart = performance.now();
+        this.testsEmitter.fire(<TestLoadStartedEvent>{ type: 'started' });
+        this._load()
             .then(res => {
-                this.log.info(`Found VUnit version ${res}`);
+                this.loadedTests = res;
+                this.testsEmitter.fire(<TestLoadFinishedEvent>{
+                    type: 'finished',
+                    suite: this.loadedTests,
+                });
             })
             .catch(err => {
-                this.log.error(err);
-                throw new Error('VUnit not found');
+                this.testsEmitter.fire(<TestLoadFinishedEvent>{
+                    type: 'finished',
+                    suite: undefined,
+                    errorMessage: err.toString(),
+                });
             });
-        this.log.info('Loading VUnit tests...');
-        this.testsEmitter.fire(<TestLoadStartedEvent>{ type: 'started' });
-        let loadStart = performance.now();
-        let vunitData = await loadVunitTests(this.workDir);
         let loadTime = performance.now() - loadStart;
         this.log.info(
-            `Loading of tests finished after ${(loadTime / 1000).toFixed(
+            `Loading VUnit tests finished in ${(loadTime / 1000).toFixed(
                 3
             )} seconds.`
         );
+    }
 
-        for (let file of vunitData.testFiles.concat(vunitData.runPy)) {
-            if (!this.watchedFiles.includes(file)) {
-                let fileWatcher = vscode.workspace.createFileSystemWatcher(
-                    file
-                );
-                this.watchedFiles.push(file);
-                fileWatcher.onDidChange(() => this.load());
-                fileWatcher.onDidDelete(() => {
-                    this.watchedFiles.splice(
-                        this.watchedFiles.indexOf(file),
-                        1
-                    );
-                    this.load();
+    private async _load(): Promise<TestSuiteInfo> {
+        if (this.loadedTests.children.length == 0) {
+            await getVunitVersion()
+                .then(res => {
+                    this.log.info(`Found VUnit version ${res}`);
+                })
+                .catch(err => {
+                    this.log.error(err);
                 });
-            }
         }
 
-        this.loadedTests = vunitData.testSuiteInfo;
+        let vunitData = await loadVunitTests(this.workDir);
 
-        this.testsEmitter.fire(<TestLoadFinishedEvent>{
-            type: 'finished',
-            suite: this.loadedTests,
-        });
+        const watch = vscode.workspace.getConfiguration().get('vunit.watch');
+        if (watch) {
+            for (let file of vunitData.testFiles.concat(vunitData.runPy)) {
+                if (!this.watchedFiles.has(file) && this.inWorkspace(file)) {
+                    let fileWatcher = vscode.workspace.createFileSystemWatcher(
+                        file
+                    );
+                    this.log.info(`Watching ${file}`);
+                    fileWatcher.onDidChange(() => {
+                        this.log.info(`${file} changed`);
+                        if (
+                            vscode.workspace
+                                .getConfiguration()
+                                .get('vunit.watch')
+                        ) {
+                            this.load();
+                        }
+                    });
+                    fileWatcher.onDidDelete(() => {
+                        this.log.info(`${file} was deleted`);
+                        this.watchedFiles.get(file)?.dispose();
+                        this.watchedFiles.delete(file);
+                        if (
+                            vscode.workspace
+                                .getConfiguration()
+                                .get('vunit.watch')
+                        ) {
+                            this.load();
+                        }
+                    });
+                    this.watchedFiles.set(file, fileWatcher);
+                }
+            }
+        } else {
+            this.watchedFiles.forEach(element => {
+                element.dispose();
+            });
+            this.watchedFiles.clear();
+        }
+        return vunitData.testSuiteInfo;
     }
 
     async run(tests: string[]): Promise<void> {
@@ -122,24 +157,51 @@ export class VUnitAdapter implements TestAdapter {
             tests,
         });
 
-        await runVunitTests(tests, this.testStatesEmitter, this.loadedTests);
+        await runVunitTests(
+            tests,
+            this.testStatesEmitter,
+            this.loadedTests
+        ).catch(err => {
+            this.log.error(err);
+        });
 
         this.testStatesEmitter.fire(<TestRunFinishedEvent>{ type: 'finished' });
     }
 
     async debug(tests: string[]): Promise<void> {
-        runVunitTestsInGui(tests, this.loadedTests);
+        if (tests.length > 1) {
+            this.log.warn(
+                'Multiple test cases selected, only the first will be run in GUI.'
+            );
+        }
+        let test = tests[0];
+        let msg = `Starting test case ${test} in GUI`;
+        vscode.window.showInformationMessage(msg);
+        this.log.info(msg);
+        runVunitTestInGui(test, this.loadedTests);
     }
 
     cancel(): void {
+        this.log.info('Canceling tests...');
         cancelRunVunitTests();
     }
 
     dispose(): void {
         this.cancel();
-        for (const disposable of this.disposables) {
-            disposable.dispose();
-        }
+        this.disposables.forEach(element => {
+            element.dispose();
+        });
         this.disposables = [];
+        this.watchedFiles.forEach(element => {
+            element.dispose();
+        });
+        this.watchedFiles.clear();
+    }
+
+    private inWorkspace(file: string) {
+        const relative = path.relative(this.workspace.uri.fsPath, file);
+        return (
+            relative && !relative.startsWith('..') && !path.isAbsolute(relative)
+        );
     }
 }

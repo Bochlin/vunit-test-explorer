@@ -23,4 +23,5 @@ begin
         end if;
         test_runner_cleanup(runner);
     end process;
+
 end architecture tb;

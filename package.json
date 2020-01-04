@@ -38,7 +38,8 @@
         "tslib": "^1.9.3",
         "vscode-test-adapter-api": "^1.7.0",
         "vscode-test-adapter-util": "^0.7.0",
-        "tree-kill": "1.2.2"
+        "tree-kill": "1.2.2",
+        "uuid-random": "1.3.0"
     },
     "devDependencies": {
         "typescript": "^3.5.3",
@@ -60,11 +61,19 @@
             "title": "VUnit Test Explorer",
             "properties": {
                 "vunit.runpy": {
-                    "description": "Path to VUnit python script (run.py) relative to workspaceFolder",
+                    "title": "run.py",
+                    "description": "Path to VUnit python script (run.py) relative to workspaceFolder.",
                     "type": "string",
                     "scope": "window"
                 },
+                "vunit.findRunPy": {
+                    "title": "Find run.py",
+                    "description": "Search workspace for a run.py file unless `vunit.runpy` is set. Fails if multiple files are found.",
+                    "type": "boolean",
+                    "default": true
+                },
                 "vunit.python": {
+                    "title": "Python executable",
                     "description": "Path to python executable",
                     "type": "string",
                     "default": "python"
@@ -83,6 +92,11 @@
                     "description": "VUnit command line options when running GUI, -g should not be added here.",
                     "type": "string",
                     "default": ""
+                },
+                "vunit.watch": {
+                    "description": "Watch run.py and testbench files for changes and reload tests on save.",
+                    "type": "boolean",
+                    "default": true
                 },
                 "vunit.logpanel": {
                     "description": "write diagnotic logs to an output panel",

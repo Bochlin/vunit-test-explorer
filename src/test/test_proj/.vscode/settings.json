@@ -1,4 +1,5 @@
 {
-    "vunit.runpy": "run.py",
-    "vunit.flattenSingleLibrary": false
+    // "vunit.runpy": "run.py",
+    "vunit.flattenSingleLibrary": false,
+    "vunit.watch": true
 }

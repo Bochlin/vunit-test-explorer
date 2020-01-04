@@ -18,6 +18,7 @@ import fs = require('fs');
 import { ChildProcess, spawn } from 'child_process';
 import kill = require('tree-kill');
 import readline = require('readline');
+import uuid = require('uuid-random');
 
 const output = vscode.window.createOutputChannel('VUnit');
 
@@ -33,7 +34,6 @@ export async function getVunitVersion(): Promise<string> {
                 })
                 .on('line', (line: string) => {
                     version = line.trim();
-                    output.appendLine(`Found VUnit version ${version}`);
                 });
         })
             .then(() => {
@@ -46,12 +46,6 @@ export async function getVunitVersion(): Promise<string> {
 }
 
 export async function loadVunitTests(workDir: string): Promise<VunitData> {
-    const runPy = getRunPy();
-    if (!runPy) {
-        return Promise.reject(
-            new Error('Cannot load VUnit tests, no run.py found.')
-        );
-    }
     const vunit: VunitExportData = await getVunitData(workDir);
     const testSuite: TestSuiteInfo = {
         type: 'suite',
@@ -118,6 +112,7 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
             testBench.label = library.label + '.' + testBench.label;
         }
     }
+    let runPy = await getRunPy();
     let vunitData: VunitData = {
         runPy: runPy,
         testSuiteInfo: testSuite,
@@ -141,13 +136,13 @@ export async function runVunitTests(
     if (vunitProcess) {
         const msg = 'Unable to start test run, VUnit is already running';
         vscode.window.showErrorMessage(msg);
-        throw new Error(msg);
+        return Promise.reject(new Error(msg));
     }
     let wsRoot = getWorkspaceRoot();
     if (!wsRoot) {
         const msg = 'Unable to start test run, no workspace folder open';
         vscode.window.showErrorMessage(msg);
-        throw new Error(msg);
+        return Promise.reject(new Error(msg));
     }
     let testNames: string[] = [];
     if (tests.length == 1 && tests[0] == 'root') {
@@ -197,46 +192,31 @@ export async function runVunitTests(
         options.push(vunitOptions as string);
     }
     options = options.concat(testNames);
-    output.appendLine(options.join(' '));
-    await runVunit(options, checkTestResults)
-        .catch(err => {
-            output.appendLine(err.toString());
-        })
-        .finally(() => {
-            vunitProcess = null;
-        });
+    await runVunit(options, checkTestResults).finally(() => {
+        vunitProcess = null;
+    });
 }
 
 export async function cancelRunVunitTests(): Promise<void> {
-    output.appendLine('Canceling tests...');
     if (vunitProcess) {
         kill(vunitProcess.pid);
     }
 }
 
-export async function runVunitTestsInGui(
-    tests: string[],
+export async function runVunitTestInGui(
+    testCaseId: string,
     loadedTests: TestSuiteInfo
 ): Promise<void> {
-    if (tests.length > 1) {
-        vscode.window.showWarningMessage(
-            'Multiple test cases selected, only the first will be run in GUI.'
-        );
-    }
-    let testCaseId = tests[0];
     let testCase = findNode(loadedTests, testCaseId);
     if (!testCase) {
         const msg = `Could not find test case with ID ${testCaseId}`;
         vscode.window.showErrorMessage(msg);
-        throw new Error(msg);
+        return Promise.reject(new Error(msg));
     } else if (testCase.type !== 'test') {
         const msg = 'Selected item to run in GUI is not a test';
         vscode.window.showErrorMessage(msg);
-        throw new Error(msg);
+        return Promise.reject(new Error(msg));
     }
-    let msg = `Starting ${testCaseId} in GUI`;
-    vscode.window.showInformationMessage(msg);
-    output.appendLine(msg);
     let options = ['--exit-0', '-g'];
     const vunitOptions = vscode.workspace
         .getConfiguration()
@@ -273,19 +253,17 @@ function getWorkspaceRoot(): string | undefined {
 }
 
 async function getVunitData(workDir: string): Promise<VunitExportData> {
-    let vunitData: VunitExportData = emptyVunitExportData;
-    const vunitJson = path.join(workDir, 'vunit.json');
+    const vunitJson = path.join(workDir, `${uuid()}.json`);
     fs.mkdirSync(path.dirname(vunitJson), { recursive: true });
-    output.appendLine('Exporting json data from VUnit...');
+    let vunitData: VunitExportData = emptyVunitExportData;
     await runVunit(['--list', `--export-json ${vunitJson}`])
         .then(() => {
             vunitData = JSON.parse(fs.readFileSync(vunitJson, 'utf-8'));
+            fs.unlinkSync(vunitJson);
         })
         .catch(err => {
-            output.appendLine(err);
             vunitData = emptyVunitExportData;
         });
-    output.appendLine('Finished exporting json data from VUnit');
     return vunitData;
 }
 
@@ -293,30 +271,36 @@ async function runVunit(
     vunitArgs: string[],
     vunitProcess: (vunit: ChildProcess) => void = () => {}
 ): Promise<string> {
+    const runPy = await getRunPy();
     return new Promise((resolve, reject) => {
-        const runPy = getRunPy();
         if (!getWorkspaceRoot()) {
-            throw new Error('Workspace root not defined.');
+            return reject(new Error('Workspace root not defined.'));
         } else if (!runPy) {
-            throw new Error('Unable to determine path of VUnit run script.');
+            return reject(
+                new Error('Unable to determine path of VUnit run script.')
+            );
         } else if (!fs.existsSync(runPy)) {
-            throw new Error(`VUnit run script ${runPy} does not exist.`);
+            return reject(Error(`VUnit run script ${runPy} does not exist.`));
         }
         const python = vscode.workspace
             .getConfiguration()
             .get('vunit.python') as string;
         const args = [runPy].concat(vunitArgs);
-        output.appendLine(python + ' ' + args.join(' '));
+        output.appendLine('');
+        output.appendLine('===========================================');
+        output.appendLine('Running VUnit: ' + python + ' ' + args.join(' '));
         let vunit = spawn(python, args, {
             cwd: getWorkspaceRoot(),
             shell: true,
         });
         vunit.on('close', (code: string) => {
-            output.appendLine(`VUnit exited with code ${code}`);
             if (code == '0') {
+                output.appendLine('\nFinished with exit code 0');
                 resolve(code);
             } else {
-                reject(new Error('VUnit returned with non-zero exit code.'));
+                let msg = `VUnit returned with non-zero exit code (${code}).`;
+                output.appendLine('\n' + msg);
+                reject(new Error(msg));
             }
         });
         vunitProcess(vunit);
@@ -329,14 +313,51 @@ async function runVunit(
     });
 }
 
-function getRunPy(): string | undefined {
-    const wsRoot = getWorkspaceRoot();
-    const runPyConf = vscode.workspace.getConfiguration().get('vunit.runpy');
-    if (wsRoot && runPyConf) {
-        return path.join(wsRoot, runPyConf as string);
-    } else {
-        return undefined;
-    }
+export async function findRunPy(
+    workspaceFolder: vscode.WorkspaceFolder
+): Promise<string[]> {
+    let results = await vscode.workspace.findFiles(
+        new vscode.RelativePattern(workspaceFolder, '**/run.py'),
+        '**/vunit/{vhdl,verilog}'
+    );
+    let runPy: string[] = results.map(file => {
+        return file.fsPath;
+    });
+    return runPy;
+}
+
+async function getRunPy(): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const workspaceFolder = (vscode.workspace.workspaceFolders || [])[0];
+        if (!workspaceFolder) {
+            return reject(
+                new Error('No workspace folder open when getting run.py')
+            );
+        }
+
+        const runPyConf = vscode.workspace
+            .getConfiguration()
+            .get('vunit.runpy');
+        if (runPyConf) {
+            resolve(path.join(workspaceFolder.uri.fsPath, runPyConf as string));
+        } else if (vscode.workspace.getConfiguration().get('vunit.findRunPy')) {
+            findRunPy(workspaceFolder).then(res => {
+                if (res.length == 1) {
+                    resolve(res[0]);
+                } else {
+                    reject(
+                        new Error(
+                            'Multiple run.py files found in workspace (' +
+                                res.join(', ') +
+                                ').'
+                        )
+                    );
+                }
+            });
+        } else {
+            reject('run.py not found');
+        }
+    });
 }
 
 export interface VunitData {
