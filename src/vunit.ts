@@ -187,7 +187,7 @@ export async function runVunitTests(
                 }
             });
     }
-    let options = ['--exit-0'];
+    let options = ['--no-color', '--exit-0'];
     const vunitOptions = vscode.workspace
         .getConfiguration()
         .get('vunit.options');
@@ -220,7 +220,7 @@ export async function runVunitTestInGui(
         vscode.window.showErrorMessage(msg);
         return Promise.reject(new Error(msg));
     }
-    let options = ['--exit-0', '-g'];
+    let options = ['--no-color', '--exit-0', '-g'];
     const vunitOptions = vscode.workspace
         .getConfiguration()
         .get('vunit.guiOptions');
