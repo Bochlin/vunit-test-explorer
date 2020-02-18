@@ -149,7 +149,7 @@ export async function runVunitTests(
     }
     let testNames: string[] = [];
     if (tests.length == 1 && tests[0] == 'root') {
-        testNames.push('*');
+        testNames.push('');
     } else {
         for (const suiteOrTestId of tests) {
             const node = findNode(loadedTests, suiteOrTestId);
