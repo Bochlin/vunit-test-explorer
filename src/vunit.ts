@@ -293,7 +293,7 @@ async function runVunit(
         output.appendLine('===========================================');
         output.appendLine('Running VUnit: ' + python + ' ' + args.join(' '));
         let vunit = spawn(python, args, {
-            cwd: getWorkspaceRoot(),
+            cwd: path.dirname(runPy),
             shell: true,
         });
         vunit.on('close', (code: string) => {
