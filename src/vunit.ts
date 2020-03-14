@@ -345,7 +345,9 @@ async function getRunPy(): Promise<string> {
             resolve(path.join(workspaceFolder.uri.fsPath, runPyConf as string));
         } else if (vscode.workspace.getConfiguration().get('vunit.findRunPy')) {
             findRunPy(workspaceFolder).then(res => {
-                if (res.length == 1) {
+                if (res.length == 0) {
+                    reject(new Error('run.py not found or configured.'));
+                } else if (res.length == 1) {
                     resolve(res[0]);
                 } else {
                     reject(
