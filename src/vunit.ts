@@ -149,7 +149,7 @@ export async function runVunitTests(
     }
     let testNames: string[] = [];
     if (tests.length == 1 && tests[0] == 'root') {
-        testNames.push('*');
+        testNames.push('');
     } else {
         for (const suiteOrTestId of tests) {
             const node = findNode(loadedTests, suiteOrTestId);
@@ -187,7 +187,7 @@ export async function runVunitTests(
                 }
             });
     }
-    let options = ['--exit-0'];
+    let options = ['--no-color', '--exit-0'];
     const vunitOptions = vscode.workspace
         .getConfiguration()
         .get('vunit.options');
@@ -220,7 +220,7 @@ export async function runVunitTestInGui(
         vscode.window.showErrorMessage(msg);
         return Promise.reject(new Error(msg));
     }
-    let options = ['--exit-0', '-g'];
+    let options = ['--no-color', '--exit-0', '-g'];
     const vunitOptions = vscode.workspace
         .getConfiguration()
         .get('vunit.guiOptions');
@@ -293,7 +293,7 @@ async function runVunit(
         output.appendLine('===========================================');
         output.appendLine('Running VUnit: ' + python + ' ' + args.join(' '));
         let vunit = spawn(python, args, {
-            cwd: getWorkspaceRoot(),
+            cwd: path.dirname(runPy),
             shell: true,
         });
         vunit.on('close', (code: string) => {
