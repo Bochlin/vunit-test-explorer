@@ -194,7 +194,11 @@ export async function runVunitTests(
     if (vunitOptions) {
         options.push(vunitOptions as string);
     }
-    options = options.concat(testNames);
+    options = options.concat(
+        testNames.map((name: string) => {
+            return '"' + name + '"';
+        })
+    );
     await runVunit(options, checkTestResults).finally(() => {
         vunitProcess = null;
     });
@@ -227,7 +231,7 @@ export async function runVunitTestInGui(
     if (vunitOptions) {
         options.push(vunitOptions as string);
     }
-    options.push(testCaseId);
+    options.push('"' + testCaseId + '"');
     runVunit(options);
 }
 
