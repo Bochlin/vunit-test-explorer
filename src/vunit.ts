@@ -148,9 +148,8 @@ export async function runVunitTests(
         return Promise.reject(new Error(msg));
     }
     let testNames: string[] = [];
-    if (tests.length == 1 && tests[0] == 'root') {
-        testNames.push('');
-    } else {
+    output.appendLine(tests[0]);
+    if (tests.length > 1 || tests[0] != 'root') {
         for (const suiteOrTestId of tests) {
             const node = findNode(loadedTests, suiteOrTestId);
             if (node) {
@@ -194,11 +193,13 @@ export async function runVunitTests(
     if (vunitOptions) {
         options.push(vunitOptions as string);
     }
-    options = options.concat(
-        testNames.map((name: string) => {
-            return '"' + name + '"';
-        })
-    );
+    if (testNames.length > 0) {
+        options = options.concat(
+            testNames.map((name: string) => {
+                return '"' + name + '"';
+            })
+        );
+    }
     await runVunit(options, checkTestResults).finally(() => {
         vunitProcess = null;
     });

@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.3.2] - 2020-04-04
+- Fix run all test cases
+
 ## [0.3.0] - 2020-04-01
 - Enclose test case name on cmd in quotes to enable running test cases with spaces
 
