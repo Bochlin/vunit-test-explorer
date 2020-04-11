@@ -3,7 +3,9 @@ context vunit_lib.vunit_context;
 
 entity tb_test1 is
     generic (
-        runner_cfg : string := runner_cfg_default
+        runner_cfg : string := runner_cfg_default;
+        integer_param : integer := 0;
+        boolean_param : boolean := false 
     );
 end entity tb_test1;
 
@@ -17,6 +19,8 @@ begin
         elsif run("test2") then
             check(false);
         elsif run("test3") then
+            check(true);
+        elsif run("testing.test4") then
             check(true);
         end if;
         test_runner_cleanup(runner);

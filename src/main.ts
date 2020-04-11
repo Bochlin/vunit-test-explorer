@@ -31,7 +31,7 @@ export async function activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(
             new TestAdapterRegistrar(
                 testHub,
-                workspaceFolder =>
+                (workspaceFolder) =>
                     new VUnitAdapter(workspaceFolder, workDir, log),
                 log
             )

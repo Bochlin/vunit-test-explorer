@@ -72,14 +72,14 @@ export class VUnitAdapter implements TestAdapter {
         let loadStart = performance.now();
         this.testsEmitter.fire(<TestLoadStartedEvent>{ type: 'started' });
         this._load()
-            .then(res => {
+            .then((res) => {
                 this.loadedTests = res;
                 this.testsEmitter.fire(<TestLoadFinishedEvent>{
                     type: 'finished',
                     suite: this.loadedTests,
                 });
             })
-            .catch(err => {
+            .catch((err) => {
                 this.testsEmitter.fire(<TestLoadFinishedEvent>{
                     type: 'finished',
                     suite: undefined,
@@ -97,10 +97,10 @@ export class VUnitAdapter implements TestAdapter {
     private async _load(): Promise<TestSuiteInfo> {
         if (this.loadedTests.children.length == 0) {
             await getVunitVersion()
-                .then(res => {
+                .then((res) => {
                     this.log.info(`Found VUnit version ${res}`);
                 })
-                .catch(err => {
+                .catch((err) => {
                     this.log.error(err);
                 });
         }
@@ -141,7 +141,7 @@ export class VUnitAdapter implements TestAdapter {
                 }
             }
         } else {
-            this.watchedFiles.forEach(element => {
+            this.watchedFiles.forEach((element) => {
                 element.dispose();
             });
             this.watchedFiles.clear();
@@ -161,7 +161,7 @@ export class VUnitAdapter implements TestAdapter {
             tests,
             this.testStatesEmitter,
             this.loadedTests
-        ).catch(err => {
+        ).catch((err) => {
             this.log.error(err);
         });
 
@@ -188,11 +188,11 @@ export class VUnitAdapter implements TestAdapter {
 
     dispose(): void {
         this.cancel();
-        this.disposables.forEach(element => {
+        this.disposables.forEach((element) => {
             element.dispose();
         });
         this.disposables = [];
-        this.watchedFiles.forEach(element => {
+        this.watchedFiles.forEach((element) => {
             element.dispose();
         });
         this.watchedFiles.clear();

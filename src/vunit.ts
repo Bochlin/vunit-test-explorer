@@ -39,7 +39,7 @@ export async function getVunitVersion(): Promise<string> {
             .then(() => {
                 resolve(version);
             })
-            .catch(err => {
+            .catch((err) => {
                 reject(new Error(err));
             });
     });
@@ -64,7 +64,7 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
         let library:
             | TestSuiteInfo
             | TestInfo
-            | undefined = testSuite.children.find(child => {
+            | undefined = testSuite.children.find((child) => {
             return child.id === libraryName;
         });
         if (!library) {
@@ -79,7 +79,7 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
         let testBench:
             | TestSuiteInfo
             | TestInfo
-            | undefined = (library as TestSuiteInfo).children.find(child => {
+            | undefined = (library as TestSuiteInfo).children.find((child) => {
             return child.id === libraryName + '.' + testBenchName;
         });
         if (!testBench) {
@@ -107,10 +107,10 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
         };
         (testBench as TestSuiteInfo).children.push(testCase);
     }
-    const flattenSingleLibrary = vscode.workspace
-        .getConfiguration()
-        .get('vunit.flattenSingleLibrary');
-    if (flattenSingleLibrary == true && testSuite.children.length == 1) {
+    const flattenSingleLibrary: boolean =
+        vscode.workspace.getConfiguration().get('vunit.flattenSingleLibrary') ||
+        false;
+    if (flattenSingleLibrary === true && testSuite.children.length === 1) {
         let library = testSuite.children[0];
         testSuite.children = [(library as TestSuiteInfo).children[0]];
         for (let testBench of testSuite.children) {
@@ -149,7 +149,7 @@ export async function runVunitTests(
     }
     let testNames: string[] = [];
     output.appendLine(tests[0]);
-    if (tests.length > 1 || tests[0] != 'root') {
+    if (tests.length > 1 || tests[0] !== 'root') {
         for (const suiteOrTestId of tests) {
             const node = findNode(loadedTests, suiteOrTestId);
             if (node) {
@@ -245,7 +245,9 @@ function findNode(
     } else if (searchNode.type === 'suite') {
         for (const child of searchNode.children) {
             const found = findNode(child, id);
-            if (found) return found;
+            if (found) {
+                return found;
+            }
         }
     }
     return undefined;
@@ -269,7 +271,7 @@ async function getVunitData(workDir: string): Promise<VunitExportData> {
             vunitData = JSON.parse(fs.readFileSync(vunitJson, 'utf-8'));
             fs.unlinkSync(vunitJson);
         })
-        .catch(err => {
+        .catch((err) => {
             vunitData = emptyVunitExportData;
         });
     return vunitData;
@@ -302,7 +304,7 @@ async function runVunit(
             shell: true,
         });
         vunit.on('close', (code: string) => {
-            if (code == '0') {
+            if (code === '0') {
                 output.appendLine('\nFinished with exit code 0');
                 resolve(code);
             } else {
@@ -328,7 +330,7 @@ export async function findRunPy(
         new vscode.RelativePattern(workspaceFolder, '**/run.py'),
         '**/{vunit,examples,acceptance/artificial}/{vhdl,verilog}'
     );
-    let runPy: string[] = results.map(file => {
+    let runPy: string[] = results.map((file) => {
         return file.fsPath;
     });
     return runPy;
@@ -349,10 +351,10 @@ async function getRunPy(): Promise<string> {
         if (runPyConf) {
             resolve(path.join(workspaceFolder.uri.fsPath, runPyConf as string));
         } else if (vscode.workspace.getConfiguration().get('vunit.findRunPy')) {
-            findRunPy(workspaceFolder).then(res => {
-                if (res.length == 0) {
+            findRunPy(workspaceFolder).then((res) => {
+                if (res.length === 0) {
                     reject(new Error('run.py not found or configured.'));
-                } else if (res.length == 1) {
+                } else if (res.length === 1) {
                     resolve(res[0]);
                 } else {
                     reject(
