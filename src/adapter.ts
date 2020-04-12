@@ -40,7 +40,7 @@ export class VUnitAdapter implements TestAdapter {
 
     private loadedTests: TestSuiteInfo = {
         type: 'suite',
-        id: 'root',
+        id: 'vunit',
         label: 'VUnit',
         children: [],
     };

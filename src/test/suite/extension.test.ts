@@ -1,7 +1,5 @@
 import * as assert from 'assert';
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
+import * as path from 'path';
 import * as vscode from 'vscode';
 import * as vunit from '../../vunit';
 
@@ -9,8 +7,24 @@ suite('Extension Test Suite', () => {
     vscode.window.showInformationMessage('Start all tests.');
 
     test('Get version', async () => {
+        console.log(process.cwd());
+        const workspaceFolder = (vscode.workspace.workspaceFolders || [])[0];
+        const runPy = path.join(workspaceFolder.uri.fsPath, 'run.py');
+        const { exec } = require('child_process');
+        let expected_version = 'Failed to get expected version';
+        await exec(
+            `python ${runPy} --version`,
+            async (err: any, stdout: any, stderr: any) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log(`stdout: ${stdout}`);
+                    console.log(`stderr: ${stderr}`);
+                    expected_version = stdout.toString().trim();
+                }
+            }
+        );
         let version = await vunit.getVunitVersion();
-        let expected_version = process.env.VUNIT_VERSION || '4.3.0';
         assert.equal(version, expected_version);
     });
 });

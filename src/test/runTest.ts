@@ -24,7 +24,6 @@ async function main() {
         await runTests({
             extensionDevelopmentPath,
             extensionTestsPath,
-            extensionTestsEnv: { VUNIT_VERSION: '4.2.0' },
             launchArgs: [testWorkspace],
         });
     } catch (err) {

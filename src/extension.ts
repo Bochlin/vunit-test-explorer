@@ -22,8 +22,9 @@ export async function activate(context: vscode.ExtensionContext) {
     const testExplorerExtension = vscode.extensions.getExtension<TestHub>(
         testExplorerExtensionId
     );
-    if (log.enabled)
+    if (log.enabled) {
         log.info(`Test Explorer ${testExplorerExtension ? '' : 'not '}found`);
+    }
 
     if (testExplorerExtension) {
         const testHub = testExplorerExtension.exports;

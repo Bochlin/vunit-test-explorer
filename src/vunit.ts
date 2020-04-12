@@ -49,7 +49,7 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
     const vunit: VunitExportData = await getVunitData(workDir);
     const testSuite: TestSuiteInfo = {
         type: 'suite',
-        id: 'root',
+        id: 'vunit',
         label: 'VUnit',
         children: [],
     };
@@ -149,7 +149,7 @@ export async function runVunitTests(
     }
     let testNames: string[] = [];
     output.appendLine(tests[0]);
-    if (tests.length > 1 || tests[0] !== 'root') {
+    if (tests.length > 1 || tests[0] !== 'vunit') {
         for (const suiteOrTestId of tests) {
             const node = findNode(loadedTests, suiteOrTestId);
             if (node) {
@@ -158,7 +158,21 @@ export async function runVunitTests(
         }
     }
 
-    function checkTestResults(vunit: ChildProcess): void {
+    let options = ['--no-color', '--exit-0'];
+    const vunitOptions = vscode.workspace
+        .getConfiguration()
+        .get('vunit.options');
+    if (vunitOptions) {
+        options.push(vunitOptions as string);
+    }
+    if (testNames.length > 0) {
+        options = options.concat(
+            testNames.map((name: string) => {
+                return '"' + name + '"';
+            })
+        );
+    }
+    await runVunit(options, (vunit: ChildProcess) => {
         vunitProcess = vunit;
         const testStart = /Starting (.*)/;
         const testEnd = /(pass|fail) \(.*\) (.*) \(.*\)/;
@@ -185,22 +199,7 @@ export async function runVunitTests(
                     });
                 }
             });
-    }
-    let options = ['--no-color', '--exit-0'];
-    const vunitOptions = vscode.workspace
-        .getConfiguration()
-        .get('vunit.options');
-    if (vunitOptions) {
-        options.push(vunitOptions as string);
-    }
-    if (testNames.length > 0) {
-        options = options.concat(
-            testNames.map((name: string) => {
-                return '"' + name + '"';
-            })
-        );
-    }
-    await runVunit(options, checkTestResults).finally(() => {
+    }).finally(() => {
         vunitProcess = null;
     });
 }
@@ -303,10 +302,10 @@ async function runVunit(
             cwd: path.dirname(runPy),
             shell: true,
         });
-        vunit.on('close', (code: string) => {
-            if (code === '0') {
+        vunit.on('close', (code) => {
+            if (code === 0) {
                 output.appendLine('\nFinished with exit code 0');
-                resolve(code);
+                resolve(code.toString());
             } else {
                 let msg = `VUnit returned with non-zero exit code (${code}).`;
                 output.appendLine('\n' + msg);
