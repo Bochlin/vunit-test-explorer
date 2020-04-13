@@ -15,6 +15,9 @@ jobs:
           node-version: '12'
       - run: npm install
       
+      # Extension dependencies
+      - run: code --install-extension code --install-extension hbenl.vscode-test-explorer
+      
       # GHDL
       - name: Install GHDL
         run: |
@@ -31,11 +34,11 @@ jobs:
           ghdl --version
       
       # Python + VUNit
-      - name: Set up Python and VUnit
+      - name: Set up Python
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
-      - name: Install dependencies
+      - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
           pip install vunit_hdl
