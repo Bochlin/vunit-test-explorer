@@ -20,3 +20,4 @@ jobs:
           sudo dpkg --install libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
           export PATH="$(pwd)/bin:$PATH"
           cd ..
+          ghdl --version
