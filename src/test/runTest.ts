@@ -24,7 +24,6 @@ async function main() {
         );
 
         // Test environment
-        // Use cp.spawn / cp.exec for custom setup
         const vscodeExecutablePath = await downloadAndUnzipVSCode('stable');
         const cliPath = resolveCliPathFromVSCodeExecutablePath(
             vscodeExecutablePath
@@ -37,8 +36,7 @@ async function main() {
                 stdio: 'inherit',
             }
         );
-        console.log(testWorkspace);
-        // Download VS Code, unzip it and run the integration test
+
         await runTests({
             extensionDevelopmentPath,
             extensionTestsPath,

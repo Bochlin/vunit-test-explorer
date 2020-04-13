@@ -52,11 +52,8 @@ async function loadRootSuite(): Promise<TestSuiteInfo> {
     const adapter = await getController();
     return new Promise<TestSuiteInfo>((resolve, reject) => {
         let loadListener = adapter.tests((testLoadEvent) => {
-            if (testLoadEvent.type === 'started') {
-                console.log('Loading tests...');
-            } else {
+            if (testLoadEvent.type === 'finished') {
                 loadListener.dispose();
-                console.log('Tests loaded');
                 const _rootSuite = testLoadEvent.suite;
                 if (_rootSuite) {
                     resolve(_rootSuite);
