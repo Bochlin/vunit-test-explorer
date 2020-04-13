@@ -1,6 +1,6 @@
 /* ------------------------------------------------------------------------------------------
  * MIT License
- * Copyright (c) 2019 Henrik Bohlin
+ * Copyright (c) 2020 Henrik Bohlin
  * Full license text can be found in /LICENSE or at https://opensource.org/licenses/MIT.
  * ------------------------------------------------------------------------------------------ */
 

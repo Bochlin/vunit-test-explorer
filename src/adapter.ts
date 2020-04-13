@@ -1,6 +1,6 @@
 /* ------------------------------------------------------------------------------------------
  * MIT License
- * Copyright (c) 2019 Henrik Bohlin
+ * Copyright (c) 2020 Henrik Bohlin
  * Full license text can be found in /LICENSE or at https://opensource.org/licenses/MIT.
  * ------------------------------------------------------------------------------------------ */
 
@@ -95,7 +95,7 @@ export class VUnitAdapter implements TestAdapter {
     }
 
     private async _load(): Promise<TestSuiteInfo> {
-        if (this.loadedTests.children.length == 0) {
+        if (this.loadedTests.children.length === 0) {
             await getVunitVersion()
                 .then((res) => {
                     this.log.info(`Found VUnit version ${res}`);

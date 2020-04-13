@@ -1,7 +1,8 @@
-src/**
 **/*.map
 package-lock.json
 tsconfig.json
 .vscode/**
 .gitignore
 *.vsix
+out/test/**
+src/test/**

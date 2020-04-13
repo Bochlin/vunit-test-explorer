@@ -18,7 +18,7 @@ begin
             check(true);
         elsif run("test2") then
             check(true);
-        elsif run("test3") then
+        elsif run("test 3") then
             check(true);
         end if;
         test_runner_cleanup(runner);
