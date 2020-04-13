@@ -3,3 +3,4 @@ out/
 **/vunit_out/
 *.vsix
 .vscode-test
+ghdl

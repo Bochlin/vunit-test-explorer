@@ -1,6 +1,11 @@
+import * as cp from 'child_process';
 import * as path from 'path';
 
-import { runTests } from 'vscode-test';
+import {
+    runTests,
+    downloadAndUnzipVSCode,
+    resolveCliPathFromVSCodeExecutablePath,
+} from 'vscode-test';
 
 async function main() {
     try {
@@ -19,6 +24,19 @@ async function main() {
         );
 
         // Test environment
+        // Use cp.spawn / cp.exec for custom setup
+        const vscodeExecutablePath = await downloadAndUnzipVSCode('stable');
+        const cliPath = resolveCliPathFromVSCodeExecutablePath(
+            vscodeExecutablePath
+        );
+        cp.spawnSync(
+            cliPath,
+            ['--install-extension', 'hbenl.vscode-test-explorer'],
+            {
+                encoding: 'utf-8',
+                stdio: 'inherit',
+            }
+        );
         console.log(testWorkspace);
         // Download VS Code, unzip it and run the integration test
         await runTests({

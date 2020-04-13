@@ -15,9 +15,6 @@ jobs:
           node-version: '12'
       - run: npm install
       
-      # Extension dependencies
-      - run: code --install-extension code --install-extension hbenl.vscode-test-explorer
-      
       # GHDL
       - name: Install GHDL
         run: |

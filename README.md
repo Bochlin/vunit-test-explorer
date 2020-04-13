@@ -1,10 +1,11 @@
 # VUnit Test Explorer (preview)
-Run your VUnit tests from the Sidebar of Visual Studio Code. Starting debug for a 
-testcase will run the test case in GUI (VUnit -g option).
 
-![](/img/screenshot.png?raw=true)
+Run your [VUnit](https://vunit.github.io/) tests from the Sidebar of Visual Studio Code.
+
+![UI example](/img/screenshot.png?raw=true)
 
 # Configuration
+
 The following configuration properties are available:
 
 Property                              | Description
@@ -46,4 +47,5 @@ ID                                   | Command
 `test-explorer.cancel`               | Cancel running tests
 
 # Dependencies
+
 This extension uses the [Test Explorer for Visual Studio Code](https://github.com/hbenl/vscode-test-explorer) extension published under the MIT license.
