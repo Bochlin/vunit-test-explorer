@@ -8,7 +8,14 @@ jobs:
     name: Test
     runs-on: ubuntu-18.04
     steps: 
+      # Node
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - run: npm install
+      
+      # GHDL
       - name: Install GHDL
         run: |
           mkdir ghdl
@@ -22,10 +29,18 @@ jobs:
           export PATH="$(pwd)/bin:$PATH"
           cd ..
           ghdl --version
-      - uses: actions/setup-node@v1
+      
+      # Python + VUNit
+      - name: Set up Python and VUnit
+        uses: actions/setup-python@v1
         with:
-          node-version: '12'
-      - run: npm install
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install vunit_hdl
+      
+      # Run the tests    
       - name: Run tests
         uses: GabrielBB/xvfb-action@v1.0
         with:
