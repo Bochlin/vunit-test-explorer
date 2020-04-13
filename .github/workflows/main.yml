@@ -22,8 +22,8 @@ jobs:
           export PATH="$(pwd)/bin:$PATH"
           cd ..
           ghdl --version
-
       - uses: actions/setup-node@v1
         with:
           node-version: '12'
-      - run: npm install 
+      - run: npm install
+      - run: npm run test
