@@ -1,0 +1,22 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-18.04
+    steps: 
+      - name: Install GHDL
+        run: |
+          mkdir ghdl
+          cd ghdl
+          wget https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-ubuntu16-mcode.tgz
+          tar -xvzf ghdl-0.37-ubuntu16-mcode.tgz
+          wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gnat-4.9/gnat-4.9-base_4.9.3-3ubuntu5_amd64.deb
+          sudo dpkg --install gnat-4.9-base_4.9.3-3ubuntu5_amd64.deb
+          wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gnat-4.9/libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
+          sudo dpkg --install libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
+          export PATH="$(pwd)/bin:$PATH"
+          cd ..
