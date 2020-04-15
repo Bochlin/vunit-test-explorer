@@ -13,13 +13,12 @@ jobs:
         # vunit: ["4.4.0", "4.3.0", "4.2.0", "4.1.0"]
     runs-on: ${{ matrix.os }}
     steps: 
-       - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       # GHDL
       - name: Install GHDL Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
         run: |
-          ls
           mkdir ghdl
           cd ghdl
           wget https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-ubuntu16-mcode.tgz
@@ -33,7 +32,6 @@ jobs:
       - name: Install GHDL Windows
         if: startsWith(matrix.os, 'windows')
         run: |
-          dir
           mkdir ghdl
           cd ghdl
           Invoke-WebRequest https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-mingw32-mcode.zip -OutFile ghdl.zip
