@@ -7,6 +7,7 @@ jobs:
   test:
     name: Test
     strategy:
+      fail-fast: false
       matrix:
         os: ["ubuntu-18.04", "windows-latest"]
         # vunit: ["4.4.0", "4.3.0", "4.2.0", "4.1.0"]
@@ -25,7 +26,7 @@ jobs:
           sudo dpkg --install gnat-4.9-base_4.9.3-3ubuntu5_amd64.deb
           wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gnat-4.9/libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
           sudo dpkg --install libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
-          echo "::set-env name=VUNIT_GHDL_PATH::$(pwd)/bin"
+          echo "::set-env name=VUNIT_GHDL_PATH::$(pwd)"
           cd ..
       - name: Install GHDL Windows
         if: startsWith(matrix.os, 'windows')
