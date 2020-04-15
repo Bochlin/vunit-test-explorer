@@ -26,8 +26,8 @@ jobs:
           sudo dpkg --install gnat-4.9-base_4.9.3-3ubuntu5_amd64.deb
           wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gnat-4.9/libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
           sudo dpkg --install libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
-          echo "::set-env name=VUNIT_GHDL_PATH::$(pwd)"
           cd ..
+          echo "::set-env name=VUNIT_GHDL_PATH::$(pwd)"
       - name: Install GHDL Windows
         if: startsWith(matrix.os, 'windows')
         run: |
