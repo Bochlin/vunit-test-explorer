@@ -13,7 +13,8 @@ jobs:
         # vunit: ["4.4.0", "4.3.0", "4.2.0", "4.1.0"]
     runs-on: ${{ matrix.os }}
     steps: 
-      
+       - uses: actions/checkout@v2
+
       # GHDL
       - name: Install GHDL Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
@@ -43,7 +44,6 @@ jobs:
 
 
       # Node
-      - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: '12'
