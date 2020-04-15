@@ -14,7 +14,7 @@ jobs:
         # vunit: ["4.4.0", "4.3.0", "4.2.0", "4.1.0"]
     runs-on: ${{ matrix.os }}
     steps: 
-      run: echo $VUNIT_GHDL_PATH
+      - run: echo $VUNIT_GHDL_PATH
       # GHDL
       - name: Install GHDL Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
