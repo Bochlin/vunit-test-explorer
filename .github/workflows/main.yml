@@ -32,7 +32,9 @@ jobs:
         run: |
           mkdir ghdl
           cd ghdl
-          cd ..
+          dir
+          wget https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-mingw32-mcode.zip -OutFile ghdl.zip
+          dir
 
       # Node
       - uses: actions/checkout@v2
