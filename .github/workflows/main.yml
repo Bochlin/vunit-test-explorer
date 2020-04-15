@@ -33,7 +33,6 @@ jobs:
           mkdir ghdl
           cd ghdl
           wget https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-mingw32-mcode.zip -OutFile ghdl.zip
-          Expand-Archive -Path ghdl.zip -DestinationPath ./
           
 
       # Node
