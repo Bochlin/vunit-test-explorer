@@ -18,6 +18,7 @@ jobs:
       - name: Install GHDL Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
         run: |
+          ls
           mkdir ghdl
           cd ghdl
           wget https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-ubuntu16-mcode.tgz
@@ -26,11 +27,12 @@ jobs:
           sudo dpkg --install gnat-4.9-base_4.9.3-3ubuntu5_amd64.deb
           wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gnat-4.9/libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
           sudo dpkg --install libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
+          echo "::set-env name=VUNIT_GHDL_PATH::$(pwd)/bin"
           cd ..
-          echo "::set-env name=VUNIT_GHDL_PATH::$(pwd)"
       - name: Install GHDL Windows
         if: startsWith(matrix.os, 'windows')
         run: |
+          dir
           mkdir ghdl
           cd ghdl
           Invoke-WebRequest https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-mingw32-mcode.zip -OutFile ghdl.zip
@@ -38,6 +40,7 @@ jobs:
           echo "::set-env name=VUNIT_GHDL_PATH::$(pwd)/GHDL/0.37-mingw32-mcode/bin"
           cd ..
       - run: echo $VUNIT_GHDL_PATH
+
 
       # Node
       - uses: actions/checkout@v2
