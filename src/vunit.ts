@@ -20,7 +20,21 @@ import kill = require('tree-kill');
 import readline = require('readline');
 import uuid = require('uuid-random');
 
-const output = vscode.window.createOutputChannel('VUnit');
+
+
+class Output {
+    private output = vscode.window.createOutputChannel('VUnit');
+    appendLine(value: string) {
+        console.log(value);
+        this.output.appendLine(value);
+    }
+    append(value: string) {
+        console.log(value);
+        this.output.append(value);
+    }
+}
+
+const output = new Output();
 
 export async function getVunitVersion(): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -65,8 +79,8 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
             | TestSuiteInfo
             | TestInfo
             | undefined = testSuite.children.find((child) => {
-            return child.id === libraryName;
-        });
+                return child.id === libraryName;
+            });
         if (!library) {
             library = {
                 type: 'suite',
@@ -80,8 +94,8 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
             | TestSuiteInfo
             | TestInfo
             | undefined = (library as TestSuiteInfo).children.find((child) => {
-            return child.id === libraryName + '.' + testBenchName;
-        });
+                return child.id === libraryName + '.' + testBenchName;
+            });
         if (!testBench) {
             testBench = {
                 type: 'suite',
@@ -278,7 +292,7 @@ async function getVunitData(workDir: string): Promise<VunitExportData> {
 
 async function runVunit(
     vunitArgs: string[],
-    vunitProcess: (vunit: ChildProcess) => void = () => {}
+    vunitProcess: (vunit: ChildProcess) => void = () => { }
 ): Promise<string> {
     const runPy = await getRunPy();
     return new Promise((resolve, reject) => {
@@ -359,8 +373,8 @@ async function getRunPy(): Promise<string> {
                     reject(
                         new Error(
                             'Multiple run.py files found in workspace (' +
-                                res.join(', ') +
-                                ').'
+                            res.join(', ') +
+                            ').'
                         )
                     );
                 }
