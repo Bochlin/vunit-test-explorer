@@ -6,7 +6,11 @@ jobs:
 
   test:
     name: Test
-    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        os: ["ubuntu-18.04", "windows-latest"]
+        # vunit: ["4.4.0", "4.3.0", "4.2.0", "4.1.0"]
+    runs-on: ${{ matrix.os }}
     steps: 
       
       # Node
@@ -17,7 +21,8 @@ jobs:
       - run: npm install
       
       # GHDL
-      - name: Install GHDL
+      - name: Install GHDL Ubuntu
+        if: startsWith(matrix.os, 'ubuntu')
         run: |
           mkdir ghdl
           cd ghdl
@@ -28,10 +33,16 @@ jobs:
           wget http://archive.ubuntu.com/ubuntu/pool/universe/g/gnat-4.9/libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
           sudo dpkg --install libgnat-4.9_4.9.3-3ubuntu5_amd64.deb
           echo "::add-path::$(pwd)/bin"
-          echo $PATH
           cd ..
-
-      - run: echo $PATH
+      - name: Install GHDL Windows
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          mkdir ghdl
+          cd ghdl
+          wget https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-mingw32-mcode.zip
+          Expand-Archive -Path ghdl.zip -DestinationPath ./
+          echo "::add-path::$(pwd)/GHDL/0.37-mingw32-mcode/bin
+          cd ..
 
       # Python + VUNit
       - name: Set up Python
@@ -41,7 +52,7 @@ jobs:
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
-          pip install vunit_hdl
+          pip install vunit_hdl==${{ vunit }}
 
       # Run the tests
       - name: Run tests
