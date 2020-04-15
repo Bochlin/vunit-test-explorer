@@ -6,13 +6,15 @@ jobs:
 
   test:
     name: Test
+    env: 
+      VUNIT_GHDL_PATH: $GITHUB_WORKSPACE/ghdl/bin
     strategy:
       matrix:
         os: ["ubuntu-18.04", "windows-latest"]
         # vunit: ["4.4.0", "4.3.0", "4.2.0", "4.1.0"]
     runs-on: ${{ matrix.os }}
     steps: 
-      
+      run: echo $VUNIT_GHDL_PATH
       # GHDL
       - name: Install GHDL Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
@@ -32,9 +34,10 @@ jobs:
         run: |
           mkdir ghdl
           cd ghdl
-          dir
           Invoke-WebRequest https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-mingw32-mcode.zip -OutFile ghdl.zip
-          dir
+          Expand-Archive .\ghdl.zip .;
+          Get-ChildItem -Path ".\GHDL\0.37-mingw32-mcode\*" | Move-Item -Destination ".\"
+          cd ..
 
       # Node
       - uses: actions/checkout@v2
