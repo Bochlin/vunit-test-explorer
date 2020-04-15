@@ -33,8 +33,7 @@ jobs:
           mkdir ghdl
           cd ghdl
           dir
-          (New-Object System.Net.WebClient).DownloadFile("https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-mingw32-mcode.zip","ghdl.zip");
-          Expand-Archive .\ghdl.zip .;
+          Invoke-WebRequest https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-mingw32-mcode.zip -OutFile ghdl.zip
           dir
 
       # Node
