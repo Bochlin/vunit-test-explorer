@@ -34,8 +34,7 @@ jobs:
           cd ghdl
           wget https://github.com/ghdl/ghdl/releases/download/v0.37/ghdl-0.37-mingw32-mcode.zip -OutFile ghdl.zip
           Expand-Archive -Path ghdl.zip -DestinationPath ./
-          echo "##[add-path]$(pwd)/GHDL/0.37-mingw32-mcode/bin
-          cd ..
+          
 
       # Node
       - uses: actions/checkout@v2
