@@ -17,8 +17,11 @@ suite('Extension Test Suite', async () => {
     const workspaceFolder = (vscode.workspace.workspaceFolders || [])[0];
 
     test('Get VUnit version', async () => {
-        const runPy = path.join(workspaceFolder.uri.fsPath, 'run.py');
-        let expected_version = execSync(`python ${runPy} --version`)
+        const runPy = path.join(
+            workspaceFolder.uri.fsPath,
+            'folder with spaces/run.py'
+        );
+        let expected_version = execSync(`python "${runPy}" --version`)
             .toString()
             .trim();
         let version = await vunit.getVunitVersion();

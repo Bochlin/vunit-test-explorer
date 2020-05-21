@@ -20,8 +20,6 @@ import kill = require('tree-kill');
 import readline = require('readline');
 import uuid = require('uuid-random');
 
-
-
 class Output {
     private output = vscode.window.createOutputChannel('VUnit');
     appendLine(value: string) {
@@ -79,8 +77,8 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
             | TestSuiteInfo
             | TestInfo
             | undefined = testSuite.children.find((child) => {
-                return child.id === libraryName;
-            });
+            return child.id === libraryName;
+        });
         if (!library) {
             library = {
                 type: 'suite',
@@ -94,8 +92,8 @@ export async function loadVunitTests(workDir: string): Promise<VunitData> {
             | TestSuiteInfo
             | TestInfo
             | undefined = (library as TestSuiteInfo).children.find((child) => {
-                return child.id === libraryName + '.' + testBenchName;
-            });
+            return child.id === libraryName + '.' + testBenchName;
+        });
         if (!testBench) {
             testBench = {
                 type: 'suite',
@@ -292,7 +290,7 @@ async function getVunitData(workDir: string): Promise<VunitExportData> {
 
 async function runVunit(
     vunitArgs: string[],
-    vunitProcess: (vunit: ChildProcess) => void = () => { }
+    vunitProcess: (vunit: ChildProcess) => void = () => {}
 ): Promise<string> {
     const runPy = await getRunPy();
     return new Promise((resolve, reject) => {
@@ -308,7 +306,7 @@ async function runVunit(
         const python = vscode.workspace
             .getConfiguration()
             .get('vunit.python') as string;
-        const args = [runPy].concat(vunitArgs);
+        const args = ['"' + runPy + '"'].concat(vunitArgs);
         output.appendLine('');
         output.appendLine('===========================================');
         output.appendLine('Running VUnit: ' + python + ' ' + args.join(' '));
@@ -373,8 +371,8 @@ async function getRunPy(): Promise<string> {
                     reject(
                         new Error(
                             'Multiple run.py files found in workspace (' +
-                            res.join(', ') +
-                            ').'
+                                res.join(', ') +
+                                ').'
                         )
                     );
                 }
