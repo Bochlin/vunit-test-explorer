@@ -70,6 +70,11 @@
                     "type": "string",
                     "default": ""
                 },
+                "vunit.exportJsonOptions": {
+                    "description": "VUnit run.py command line options when discovering test with --export-json.",
+                    "type": "string",
+                    "default": ""
+                },
                 "vunit.watch": {
                     "description": "Watch run.py and testbench files for changes and reload tests on save.",
                     "type": "boolean",
