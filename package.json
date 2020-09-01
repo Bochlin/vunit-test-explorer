@@ -61,12 +61,12 @@
                     "default": false
                 },
                 "vunit.options": {
-                    "description": "VUnit command line options.",
+                    "description": "VUnit run.py command line options when running tests.",
                     "type": "string",
                     "default": ""
                 },
                 "vunit.guiOptions": {
-                    "description": "VUnit command line options when running GUI, -g should not be added here.",
+                    "description": "VUnit run.py command line options when running GUI, -g should not be added here.",
                     "type": "string",
                     "default": ""
                 },
