@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.4.0] - 2020-09-06
+
+- Add `vunit.exportJsonOptions` property to add command line options to `run.py` when VUnit Test Explorer discovers test cases through `run.py --list --export-json x`.
+
 ## [0.3.3] - 2020-04-04
 
 - Fix run.py path with spaces
