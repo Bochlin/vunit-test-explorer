@@ -15,8 +15,9 @@ Property                              | Description
 `vunit.watch`                         | Watch run.py and test bench files for changes and reload tests automatically.
 `vunit.python`                        | Path to python executable.
 `vunit.flattenSingleLibrary`          | Flatten library hierarchy in explorer when all tests are contained within a single library.
-`vunit.options`                       | VUnit command line options.
-`vunit.guiOptions`                    | VUnit command line options when running GUI (-g should not be added here).
+`vunit.options`                       | VUnit run.py command line options when running tests.
+`vunit.guiOptions`                    | VUnit run.py command line options when running GUI (-g should not be added here).
+`vunit.exportJsonOptions`             | VUnit run.py command line options when discovering test with --export-json.
 `testExplorer.onStart`                | Retire or reset all test states whenever a test run is started
 `testExplorer.onReload`               | Retire or reset all test states whenever the test tree is reloaded
 `testExplorer.codeLens`               | Show a CodeLens above each test or suite for running or debugging the tests

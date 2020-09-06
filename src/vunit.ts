@@ -276,8 +276,16 @@ function getWorkspaceRoot(): string | undefined {
 async function getVunitData(workDir: string): Promise<VunitExportData> {
     const vunitJson = path.join(workDir, `${uuid()}.json`);
     fs.mkdirSync(path.dirname(vunitJson), { recursive: true });
+
     let vunitData: VunitExportData = emptyVunitExportData;
-    await runVunit(['--list', `--export-json ${vunitJson}`])
+    let options = ['--list', `--export-json ${vunitJson}`];
+    const vunitExportJsonOptions = vscode.workspace
+        .getConfiguration()
+        .get('vunit.exportJsonOptions');
+    if (vunitExportJsonOptions) {
+        options.push(vunitExportJsonOptions as string);
+    }
+    await runVunit(options)
         .then(() => {
             vunitData = JSON.parse(fs.readFileSync(vunitJson, 'utf-8'));
             fs.unlinkSync(vunitJson);
