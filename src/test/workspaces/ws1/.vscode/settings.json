@@ -1,4 +1,6 @@
 {
     "vunit.flattenSingleLibrary": false,
-    "vunit.watch": true
+    "vunit.watch": true,
+    "vunit.options": "--testlib2",
+    "vunit.exportJsonOptions": "--testlib2"
 }

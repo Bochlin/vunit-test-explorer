@@ -51,6 +51,15 @@ suite('Extension Test Suite', async () => {
     }).timeout(20000);
 });
 
+async function setWorkspaceSetting(section: string, setting: any) {
+    const config = vscode.workspace.getConfiguration();
+    await config.update(
+        section,
+        setting,
+        false
+    );
+   }
+
 async function loadRootSuite(): Promise<TestSuiteInfo> {
     const adapter = await getController();
     return new Promise<TestSuiteInfo>((resolve, reject) => {
