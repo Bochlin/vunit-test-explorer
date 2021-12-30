@@ -278,7 +278,7 @@ async function getVunitData(workDir: string): Promise<VunitExportData> {
     fs.mkdirSync(path.dirname(vunitJson), { recursive: true });
 
     let vunitData: VunitExportData = emptyVunitExportData;
-    let options = ['--list', `--export-json ${vunitJson}`];
+    let options = ['--list', `--export-json "${vunitJson}"`];
     const vunitExportJsonOptions = vscode.workspace
         .getConfiguration()
         .get('vunit.exportJsonOptions');
